@@ -2,13 +2,13 @@
 {
   "modid": "bpopener",
   "name": "Backpack Opener",
-  "description": "Example placeholder mod.",
+  "description": "Open GUI items directly from your inventory!",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["CleanroomMC"],
-  "credits": "Authors of this project",
+  "authorList": ["Blue_Beaker"],
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

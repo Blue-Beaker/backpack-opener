@@ -8,11 +8,11 @@ import javax.annotation.Nullable;
 
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
-import zone.rong.mixinbooter.ILateMixinLoader;
+import zone.rong.mixinbooter.IEarlyMixinLoader;
 
 @IFMLLoadingPlugin.Name("bpopener")
 @IFMLLoadingPlugin.MCVersion(ForgeVersion.mcVersion)
-public class BPOpenerMixins implements IFMLLoadingPlugin, ILateMixinLoader {
+public class BPOpenerMixins implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public List<String> getMixinConfigs() {

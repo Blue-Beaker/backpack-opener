@@ -3,6 +3,7 @@ package io.bluebeaker.bpopener;
 import org.lwjgl.input.Mouse;
 
 import crafttweaker.api.minecraft.CraftTweakerMC;
+import io.bluebeaker.bpopener.mixin.AccessorGuiContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
@@ -25,7 +26,12 @@ public class BPOHandler {
 
     @SubscribeEvent
     public static void onRightClick(GuiScreenEvent.MouseInputEvent.Pre event) {
+        // Only if right button is down
+        if (!(Mouse.getEventButtonState() && Mouse.getEventButton() == 1))
+            return;
+
         GuiScreen screen = event.getGui();
+
         if (!(screen instanceof GuiInventory || screen instanceof GuiContainerCreative))
             return;
 
@@ -44,35 +50,48 @@ public class BPOHandler {
         if (action == null)
             return;
 
-        if (Mouse.getEventButtonState() && Mouse.getEventButton() == 1) {
+        lastSlot1 = slot.getSlotIndex();
+        lastSlot2 = player.inventory.currentItem;
+        
+        ((AccessorGuiContainer)container).invokeHandleMouseClick(slot,slot.slotNumber,lastSlot2,ClickType.SWAP);
 
-            lastSlot1 = slot.getSlotIndex();
-            lastSlot2 = player.inventory.currentItem;
+        // doSwap(container.inventorySlots.windowId, slot.getSlotIndex(), player.inventory.currentItem);
 
-            doSwap(container.inventorySlots.windowId, slot.getSlotIndex(), player.inventory.currentItem);
-            swapped = true;
 
-            event.setCanceled(true);
-            boolean sneaking = player.isSneaking();
-            player.setSneaking(action.isSneaking());
-            mc.playerController.processRightClick(player, mc.world, EnumHand.MAIN_HAND);
-            player.setSneaking(sneaking);
-        }
+
+        swapped = true;
+
+        boolean sneaking = player.isSneaking();
+        player.setSneaking(action.isSneaking());
+        mc.playerController.processRightClick(player, mc.world, EnumHand.MAIN_HAND);
+        player.setSneaking(sneaking);
+
+        event.setCanceled(true);
     }
 
     @SubscribeEvent
     public static void onGuiClosed(GuiOpenEvent event) {
-        if (swapped && event.getGui() == null) {
-            swapped = false;
-            GuiInventory guiInventory = new GuiInventory(mc.player);
-            event.setGui(guiInventory);
-            doSwap(guiInventory.inventorySlots.windowId, lastSlot1, lastSlot2);
+        try {
+            if (swapped && event.getGui() == null) {
+                swapped = false;
+                GuiInventory guiInventory = new GuiInventory(mc.player);
+                event.setGui(guiInventory);
+                doSwap(guiInventory.inventorySlots.windowId, lastSlot1, lastSlot2);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     }
 
-    public static void doSwap(int windowID, int index1, int index2) {
-        if (index1 != index2)
+    public static void doSwap(int windowID, int index1, int hotbar_index2) {
+        if (index1 != hotbar_index2) {
+            // mc.player.inventoryContainer.slotClick(index1, hotbar_index2, ClickType.SWAP,
+            // mc.player);
+            // mc.player.inventoryContainer.detectAndSendChanges();
+
             mc.playerController.windowClick(windowID, index1,
-                    index2, ClickType.SWAP, mc.player);
+                    hotbar_index2, ClickType.SWAP, mc.player);
+
+        }
     }
 }

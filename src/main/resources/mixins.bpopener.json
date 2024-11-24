@@ -3,7 +3,7 @@
     "compatibilityLevel": "JAVA_8",
     "package": "io.bluebeaker.bpopener.mixin",
     "mixins": [
-
+      "AccessorGuiContainer"
     ],
     "client": [
     ],
