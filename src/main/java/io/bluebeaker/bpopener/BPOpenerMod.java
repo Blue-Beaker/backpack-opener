@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = BPOpenerMod.MODID, name = BPOpenerMod.NAME, version = BPOpenerMod.VERSION)
+@Mod(modid = BPOpenerMod.MODID, name = BPOpenerMod.NAME, version = BPOpenerMod.VERSION,clientSideOnly = true)
 public class BPOpenerMod
 {
     public static final String MODID = "bpopener";
@@ -47,5 +47,8 @@ public class BPOpenerMod
 
     public void logInfo(String log){
         logger.info(log);
+    }
+    public static Logger getLogger(){
+        return logger;
     }
 }

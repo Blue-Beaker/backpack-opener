@@ -7,7 +7,7 @@ import net.minecraftforge.common.config.Config.Type;
 
 @Config(modid = BPOpenerMod.MODID,type = Type.INSTANCE,category = "general")
 public class BPOpenerConfig {
-    @Comment("Example")
-    @LangKey("config.bpopener.example.name")
-    public static boolean example = true;
+    @Comment("Add a line to the tooltip when hovered item can be opened by this mod.")
+    @LangKey("config.bpopener.addTooltip.name")
+    public static boolean addTooltip = true;
 }

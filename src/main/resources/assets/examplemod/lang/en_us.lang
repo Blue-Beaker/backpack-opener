@@ -1,1 +1,2 @@
-config.bpopener.example.name=Example
+config.bpopener.addTooltip.name=Enable Tooltips
+tooltip.bpopener.open.name=§f§oRight Click to Open§r

@@ -1,5 +1,9 @@
 # Backpack Opener
-A mod to help using handheld GUI items, like backpacks and terminals.  
+A client-side mod to make using handheld GUI items quicker, For example:
+- Backpacks
+- Wireless terminals
+- Books
+
 Open them by simply right-clicking it in your inventory GUI.  
 It automatically swaps the item to your active hand and open it. After closing the GUI of item, the item is swapped back and you're back in your inventory.  
 
