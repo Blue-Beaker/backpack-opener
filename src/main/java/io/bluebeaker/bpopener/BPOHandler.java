@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
@@ -32,7 +31,7 @@ public class BPOHandler {
 
         GuiScreen screen = event.getGui();
 
-        if (!(screen instanceof GuiInventory || screen instanceof GuiContainerCreative))
+        if (!(screen instanceof GuiContainer))
             return;
 
         GuiContainer container = (GuiContainer) screen;
