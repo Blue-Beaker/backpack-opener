@@ -2,7 +2,7 @@
 {
   "modid": "bpopener",
   "name": "Backpack Opener",
-  "description": "Open GUI items directly from your inventory!",
+  "description": "Open handheld GUI items from your inventory in one right-click! Configurable with CraftTweaker.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
