@@ -117,6 +117,7 @@ dependencies {
     runtimeOnly rfg.deobf('curse.maven:ftb-library-legacy-forge-237167:2985811')
     runtimeOnly rfg.deobf('curse.maven:ftb-utilities-forge-237102:3157548')
 
+    runtimeOnly rfg.deobf("curse.maven:forestry-59751:2918418")
     runtimeOnly rfg.deobf("curse.maven:applied-energistics-2-223794:2747063")
     
     implementation rfg.deobf("curse.maven:mtlib-253211:3308160")
