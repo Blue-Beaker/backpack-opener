@@ -93,25 +93,29 @@ public class BPOHandler {
             BPOpenerMod.getLogger().error("Error closing GUI:", e);
         }
     }
+
     /** Add tooltip when the item can be opened */
     @SubscribeEvent
     public static void addTooltip(ItemTooltipEvent event) {
+        if (activated || GuiScreen.isShiftKeyDown())
+            return;
         ItemStack stack = event.getItemStack();
         EntityPlayer player = event.getEntityPlayer();
-        
-        if (stack == null || player == null || GuiScreen.isShiftKeyDown())
+
+        if (stack == null || player == null)
             return;
         GuiScreen screen = mc.currentScreen;
-        
+
         if (!(screen instanceof GuiContainer))
             return;
 
-        Slot slot = ((GuiContainer)screen).getSlotUnderMouse();
-        if(slot==null || slot.inventory!=player.inventory) return;
+        Slot slot = ((GuiContainer) screen).getSlotUnderMouse();
+        if (slot == null || slot.inventory != player.inventory)
+            return;
 
         if (BPOEntries.getOpenAction(CraftTweakerMC.getIItemStack(stack)) == null)
             return;
-            
+
         event.getToolTip().add(new TextComponentTranslation("tooltip.bpopener.open.name").getFormattedText());
     }
 
