@@ -29,7 +29,7 @@ public class BPOEntries {
         }
         CraftTweakerAPI.apply(new AddBPOAction(ingredient, action));
     }
-
+    /**Get the open action from an item */
     public static OpenAction getOpenAction(IItemStack item) {
         List<OpenAction> actions = OPEN_ACTIONS.getEntries(item);
         if(actions.size()>0){
