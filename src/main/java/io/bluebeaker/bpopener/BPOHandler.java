@@ -3,7 +3,6 @@ package io.bluebeaker.bpopener;
 import org.lwjgl.input.Mouse;
 
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import io.bluebeaker.bpopener.mixin.AccessorGuiContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
@@ -57,16 +56,16 @@ public class BPOHandler {
             return;
 
         // Do swap and use the item
-
         lastSlot1 = slot.getSlotIndex();
         lastSlot2 = player.inventory.currentItem;
 
-        doSwap2(container, slot, lastSlot2);
-
-        // ((AccessorGuiContainer)container).invokeHandleMouseClick(slot,slot.slotNumber,lastSlot2,ClickType.SWAP);
-
-        // doSwap(container.inventorySlots.windowId, slot.getSlotIndex(),
-        // player.inventory.currentItem);
+        // When item is in hotbar, switch to it instead of swap
+        if (lastSlot1 < 9) {
+            player.inventory.currentItem=lastSlot1;
+        } else {
+            doSwap(container.inventorySlots.windowId, slot.getSlotIndex(),
+                    player.inventory.currentItem);
+        }
 
         activated = true;
 
@@ -87,7 +86,13 @@ public class BPOHandler {
                 activated = false;
                 GuiInventory guiInventory = new GuiInventory(mc.player);
                 event.setGui(guiInventory);
-                doSwap(guiInventory.inventorySlots.windowId, lastSlot1, lastSlot2);
+
+                // When item is in hotbar, switch to it instead of swap
+                if (lastSlot1 < 9) {
+                    mc.player.inventory.currentItem = lastSlot2;
+                } else {
+                    doSwap(guiInventory.inventorySlots.windowId, lastSlot1, lastSlot2);
+                }
             }
         } catch (Exception e) {
             BPOpenerMod.getLogger().error("Error closing GUI:", e);
@@ -123,13 +128,6 @@ public class BPOHandler {
         if (index1 != hotbar_index2) {
             mc.playerController.windowClick(windowID, index1,
                     hotbar_index2, ClickType.SWAP, mc.player);
-        }
-    }
-
-    private static void doSwap2(GuiContainer container, Slot slot, int hotbar_index2) {
-        if (slot.slotNumber != hotbar_index2) {
-            ((AccessorGuiContainer) container).invokeHandleMouseClick(slot, slot.slotNumber, hotbar_index2,
-                    ClickType.SWAP);
         }
     }
 }
