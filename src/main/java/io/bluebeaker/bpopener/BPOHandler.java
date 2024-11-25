@@ -21,11 +21,11 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class BPOHandler {
-    /**Whether this is already active */
+    /** Whether this is already active */
     static boolean activated = false;
-    /**The slot with the item to open, used to swap the item back */
+    /** The slot with the item to open, used to swap the item back */
     static int lastSlot1 = -1;
-    /**The previously active slot in the hotbar, used to swap the item back */
+    /** The previously active slot in the hotbar, used to swap the item back */
     static int lastSlot2 = -1;
     private static Minecraft mc = Minecraft.getMinecraft();
 
@@ -41,14 +41,18 @@ public class BPOHandler {
 
         GuiScreen screen = event.getGui();
 
-        if (!(screen instanceof GuiInventory) && !(screen instanceof GuiContainerCreative))
+        if (!(screen instanceof GuiContainer))
             return;
 
         GuiContainer container = (GuiContainer) screen;
         Slot slot = container.getSlotUnderMouse();
+
         EntityPlayerSP player = mc.player;
         // Check slot is in player inventory
         if (slot == null || slot.inventory != player.inventory)
+            return;
+        // If slot isn't in hotbar, restrict to only work in inventory
+        if (slot.getSlotIndex() >= 9 && !(screen instanceof GuiInventory) && !(screen instanceof GuiContainerCreative))
             return;
         // Check if stack is valid and size 1
         ItemStack stack = slot.getStack();
@@ -65,14 +69,16 @@ public class BPOHandler {
 
         // When item is in hotbar, switch to it instead of swap
         if (lastSlot1 < 9) {
-            player.inventory.currentItem=lastSlot1;
+            player.inventory.currentItem = lastSlot1;
         } else {
             doSwap(container.inventorySlots.windowId, slot.getSlotIndex(),
                     player.inventory.currentItem);
         }
 
         // Dont set to activated when swap failed
-        if(player.inventory.getCurrentItem()!=stack){return;}
+        if (player.inventory.getCurrentItem() != stack) {
+            return;
+        }
 
         activated = true;
 
@@ -112,32 +118,32 @@ public class BPOHandler {
         // Do not activate when a swap is active or shift is down
         if (activated || GuiScreen.isShiftKeyDown())
             return;
-        
+
         ItemStack stack = event.getItemStack();
         EntityPlayer player = event.getEntityPlayer();
         if (stack == null || player == null)
             return;
 
-        // If current stack is immovable (like a opened backpack), cancel action
-        if(!player.inventoryContainer.getSlot(player.inventory.currentItem).canTakeStack(player))
-            return;
-        
         GuiScreen screen = mc.currentScreen;
 
-        if (!(screen instanceof GuiInventory) && !(screen instanceof GuiContainerCreative))
+        if (!(screen instanceof GuiContainer))
             return;
 
         // Check whether the slot is in player's inventory
         Slot slot = ((GuiContainer) screen).getSlotUnderMouse();
         if (slot == null || slot.inventory != player.inventory)
             return;
+        // If slot isn't in hotbar, restrict to only work in inventory
+        if (slot.getSlotIndex() >= 9 && !(screen instanceof GuiInventory) && !(screen instanceof GuiContainerCreative))
+            return;
+
         // Check whether an open action is available
         if (BPOEntries.getOpenAction(CraftTweakerMC.getIItemStack(stack)) == null)
             return;
-        
+
         event.getToolTip().add(new TextComponentTranslation("tooltip.bpopener.open.name").getFormattedText());
     }
-    
+
     private static void doSwap(int windowID, int index1, int hotbar_index2) {
         if (index1 != hotbar_index2) {
             mc.playerController.windowClick(windowID, index1,
