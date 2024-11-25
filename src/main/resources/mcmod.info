@@ -11,6 +11,6 @@
   "credits": "",
   "logoFile": "icon.png",
   "screenshots": [],
-  "dependencies": []
+  "dependencies": ["crafttweaker>=4.1.20.689"]
 }
 ]
