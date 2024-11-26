@@ -10,4 +10,7 @@ public class BPOpenerConfig {
     @Comment("Add a line to the tooltip when hovered item can be opened by this mod.")
     @LangKey("config.bpopener.addTooltip.name")
     public static boolean addTooltip = true;
+
+    @Comment("Shows additional info for debug.")
+    public static boolean debug = false;
 }

@@ -52,7 +52,7 @@ public class BPOHandler {
         if (slot == null || slot.inventory != player.inventory)
             return;
         // If slot isn't in hotbar, restrict to only work in inventory
-        if (slot.getSlotIndex() >= 9 && !(screen instanceof GuiInventory) && !(screen instanceof GuiContainerCreative))
+        if (!isSlotValidToSwap(slot, screen))
             return;
         // Check if stack is valid and size 1
         ItemStack stack = slot.getStack();
@@ -67,16 +67,25 @@ public class BPOHandler {
         lastSlot1 = slot.getSlotIndex();
         lastSlot2 = player.inventory.currentItem;
 
+        if (BPOpenerConfig.debug)
+            BPOpenerMod.getLogger()
+                    .info("Attempt to swap slots " + slot.getSlotIndex() + " slotNumber " + slot.slotNumber
+                            + " with hotbar " + lastSlot2+" in gui "+container.getClass().getName());
+
+        // When GUI is inventory, use slotIndex
+        int index1 = (screen instanceof GuiInventory) || (screen instanceof GuiContainerCreative) ? slot.getSlotIndex() : slot.slotNumber;
         // When item is in hotbar, switch to it instead of swap
         if (lastSlot1 < 9) {
             player.inventory.currentItem = lastSlot1;
         } else {
-            doSwap(container.inventorySlots.windowId, slot.getSlotIndex(),
+            doSwap(container.inventorySlots.windowId, index1,
                     player.inventory.currentItem);
         }
 
         // Dont set to activated when swap failed
         if (player.inventory.getCurrentItem() != stack) {
+            doSwap(container.inventorySlots.windowId, index1,
+                    player.inventory.currentItem);
             return;
         }
 
@@ -115,8 +124,7 @@ public class BPOHandler {
     /** Add tooltip when the item can be opened */
     @SubscribeEvent
     public static void addTooltip(ItemTooltipEvent event) {
-        // Do not activate when a swap is active or shift is down
-        if (activated || GuiScreen.isShiftKeyDown())
+        if (!shouldWork())
             return;
 
         ItemStack stack = event.getItemStack();
@@ -134,7 +142,7 @@ public class BPOHandler {
         if (slot == null || slot.inventory != player.inventory)
             return;
         // If slot isn't in hotbar, restrict to only work in inventory
-        if (slot.getSlotIndex() >= 9 && !(screen instanceof GuiInventory) && !(screen instanceof GuiContainerCreative))
+        if (!isSlotValidToSwap(slot, screen))
             return;
 
         // Check whether an open action is available
@@ -142,6 +150,21 @@ public class BPOHandler {
             return;
 
         event.getToolTip().add(new TextComponentTranslation("tooltip.bpopener.open.name").getFormattedText());
+    }
+
+    /** If slot isn't in hotbar, restrict to only work in inventory */
+    private static boolean isSlotValidToSwap(Slot slot, GuiScreen screen) {
+        // if (slot.getSlotIndex() >= 9 && !(screen instanceof GuiInventory) && !(screen
+        // instanceof GuiContainerCreative))
+        // return false;
+        return true;
+    }
+
+    /** Do not activate when a swap is active or shift is down */
+    private static boolean shouldWork() {
+        if (activated || GuiScreen.isShiftKeyDown())
+            return false;
+        return true;
     }
 
     private static void doSwap(int windowID, int index1, int hotbar_index2) {
