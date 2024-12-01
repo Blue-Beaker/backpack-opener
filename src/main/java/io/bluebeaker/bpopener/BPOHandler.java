@@ -115,6 +115,9 @@ public class BPOHandler {
                 } else {
                     doSwap(guiInventory.inventorySlots.windowId, lastSlot1, lastSlot2);
                 }
+                if(!BPOpenerConfig.returnToInventory){
+                    event.setGui(null);
+                }
             }
         } catch (Exception e) {
             BPOpenerMod.getLogger().error("Error closing GUI:", e);
