@@ -1,2 +1,3 @@
 config.bpopener.addTooltip.name=Enable Tooltips
+config.bpopener.returnToInventory.name=Return to Inventory
 tooltip.bpopener.open.name=§f§oRight Click to Open§r
