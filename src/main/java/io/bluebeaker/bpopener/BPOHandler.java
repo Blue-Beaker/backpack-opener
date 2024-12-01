@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -28,6 +29,7 @@ public class BPOHandler {
     /** The previously active slot in the hotbar, used to swap the item back */
     static int lastSlot2 = -1;
     private static Minecraft mc = Minecraft.getMinecraft();
+    static boolean previousSneaking = false;
 
     /** Activate the backpack opener */
     @SubscribeEvent
@@ -70,10 +72,11 @@ public class BPOHandler {
         if (BPOpenerConfig.debug)
             BPOpenerMod.getLogger()
                     .info("Attempt to swap slots " + slot.getSlotIndex() + " slotNumber " + slot.slotNumber
-                            + " with hotbar " + lastSlot2+" in gui "+container.getClass().getName());
+                            + " with hotbar " + lastSlot2 + " in gui " + container.getClass().getName());
 
         // When GUI is inventory, use slotIndex
-        int index1 = (screen instanceof GuiInventory) || (screen instanceof GuiContainerCreative) ? slot.getSlotIndex() : slot.slotNumber;
+        int index1 = (screen instanceof GuiInventory) || (screen instanceof GuiContainerCreative) ? slot.getSlotIndex()
+                : slot.slotNumber;
         // When item is in hotbar, switch to it instead of swap
         if (lastSlot1 < 9) {
             player.inventory.currentItem = lastSlot1;
@@ -91,13 +94,31 @@ public class BPOHandler {
 
         activated = true;
 
-        boolean sneaking = player.isSneaking();
-        player.setSneaking(action.isSneaking());
+        boolean shouldSneak = action.isSneaking();
+        previousSneaking = player.movementInput.sneak;
+
+        // If should change sneak state
+        if (shouldSneak != previousSneaking) {
+            setPlayerSneakState(shouldSneak);
+        }
+
         mc.playerController.processRightClick(player, mc.world, EnumHand.MAIN_HAND);
-        player.setSneaking(sneaking);
+
+        // Revert sneak state
+        if (shouldSneak != previousSneaking) {
+            setPlayerSneakState(previousSneaking);
+        }
 
         // Cancel the event to prevent item being picked up
         event.setCanceled(true);
+    }
+
+    /** Update sneak state on both sides*/ 
+    private static void setPlayerSneakState(boolean sneak) {
+        mc.player.movementInput.sneak = true;
+        mc.player.setSneaking(true);
+        mc.getConnection().sendPacket(new CPacketEntityAction(mc.player,
+                sneak ? CPacketEntityAction.Action.START_SNEAKING : CPacketEntityAction.Action.STOP_SNEAKING));
     }
 
     /** Get back to inventory GUI after closing item GUI */
@@ -106,6 +127,7 @@ public class BPOHandler {
         try {
             if (activated && event.getGui() == null) {
                 activated = false;
+
                 GuiInventory guiInventory = new GuiInventory(mc.player);
                 event.setGui(guiInventory);
 
@@ -115,7 +137,7 @@ public class BPOHandler {
                 } else {
                     doSwap(guiInventory.inventorySlots.windowId, lastSlot1, lastSlot2);
                 }
-                if(!BPOpenerConfig.returnToInventory){
+                if (!BPOpenerConfig.returnToInventory) {
                     event.setGui(null);
                 }
             }
