@@ -11,6 +11,10 @@ public class BPOpenerConfig {
     @LangKey("config.bpopener.addTooltip.name")
     public static boolean addTooltip = true;
 
+    @Comment("Return to inventory after closing the GUI.")
+    @LangKey("config.bpopener.returnToInventory.name")
+    public static boolean returnToInventory = true;
+
     @Comment("Shows additional info for debug.")
     public static boolean debug = false;
 }
