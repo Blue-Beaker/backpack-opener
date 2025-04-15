@@ -50,6 +50,9 @@ public class BPOHandler {
         Slot slot = container.getSlotUnderMouse();
 
         EntityPlayerSP player = mc.player;
+        // Do not activate when player is holding item
+        if(!player.inventory.getItemStack().isEmpty()) return;
+
         // Check slot is in player inventory
         if (slot == null || slot.inventory != player.inventory)
             return;
@@ -149,7 +152,7 @@ public class BPOHandler {
     /** Add tooltip when the item can be opened */
     @SubscribeEvent
     public static void addTooltip(ItemTooltipEvent event) {
-        if (!shouldWork())
+        if (!BPOpenerConfig.addTooltip || !shouldWork())
             return;
 
         ItemStack stack = event.getItemStack();
