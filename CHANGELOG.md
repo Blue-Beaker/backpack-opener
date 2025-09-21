@@ -8,3 +8,6 @@ Added config option to toggle return to inventory after closing the GUI
 Do not activate when player is holding item.  
 Fixed tooltip configuration  
 Remove remote-side requirement.  
+# 1.1.0
+Add an optional delay option to workaround desync issues  
+Fix desync when closing GUI and right-clicking the backpack at same time  
