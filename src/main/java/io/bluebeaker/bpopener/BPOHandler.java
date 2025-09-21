@@ -1,5 +1,6 @@
 package io.bluebeaker.bpopener;
 
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Mouse;
 
 import crafttweaker.api.minecraft.CraftTweakerMC;
@@ -30,6 +31,9 @@ public class BPOHandler {
     static int lastSlot2 = -1;
     private static Minecraft mc = Minecraft.getMinecraft();
     static boolean previousSneaking = false;
+
+    private static int ticksUntilNextClick = -1;
+    private static BackPackClickAction nextClick = null;
 
     /** Activate the backpack opener */
     @SubscribeEvent
@@ -80,10 +84,12 @@ public class BPOHandler {
         // When GUI is inventory, use slotIndex
         int index1 = (screen instanceof GuiInventory) || (screen instanceof GuiContainerCreative) ? slot.getSlotIndex()
                 : slot.slotNumber;
+        boolean swapped = false;
         // When item is in hotbar, switch to it instead of swap
         if (lastSlot1 < 9) {
             player.inventory.currentItem = lastSlot1;
         } else {
+            swapped=true;
             doSwap(container.inventorySlots.windowId, index1,
                     player.inventory.currentItem);
         }
@@ -95,8 +101,36 @@ public class BPOHandler {
             return;
         }
 
-        activated = true;
+        //add a delay before opening the backpack if it's set
+        if(swapped && BPOpenerConfig.openDelay>0){
+            queueClickAction(action,stack);
+        }else {
+            doClickAction(action, player);
+        }
 
+        // Cancel the event to prevent item being picked up
+        event.setCanceled(true);
+    }
+
+    private static void queueClickAction(OpenAction action, ItemStack stack){
+        ticksUntilNextClick=BPOpenerConfig.openDelay;
+        nextClick=new BackPackClickAction(action,stack);
+    }
+    // Process queued click after delay
+    @SubscribeEvent
+    public static void onTick(TickEvent.ClientTickEvent event){
+        if(BPOpenerConfig.openDelay<=0) return;
+        if(ticksUntilNextClick==0 && nextClick!=null){
+            if(mc.player.getHeldItemMainhand().isItemEqual(nextClick.stack))
+                doClickAction(nextClick.action,mc.player);
+        }
+        if(ticksUntilNextClick>=0){
+            ticksUntilNextClick--;
+        }
+    }
+
+    private static void doClickAction(OpenAction action, EntityPlayerSP player) {
+        activated = true;
         boolean shouldSneak = action.isSneaking();
         previousSneaking = player.movementInput.sneak;
 
@@ -111,9 +145,6 @@ public class BPOHandler {
         if (shouldSneak != previousSneaking) {
             setPlayerSneakState(previousSneaking);
         }
-
-        // Cancel the event to prevent item being picked up
-        event.setCanceled(true);
     }
 
     /** Update sneak state on both sides*/ 
@@ -128,6 +159,12 @@ public class BPOHandler {
     @SubscribeEvent
     public static void onGuiClosed(GuiOpenEvent event) {
         try {
+            // Clear queued swap
+            if(ticksUntilNextClick>0 || nextClick!=null){
+                ticksUntilNextClick=-1;
+                nextClick=null;
+                return;
+            }
             if (activated && event.getGui() == null) {
                 activated = false;
 

@@ -15,6 +15,13 @@ public class BPOpenerConfig {
     @LangKey("config.bpopener.returnToInventory.name")
     public static boolean returnToInventory = true;
 
+    @Config.RangeInt(min = 0,max = 100)
+    @Comment({"Adds a delay after swapping and before using the item.",
+        "To prevent the desync problem.",
+        "Do not close the inventory during the delay, it may still cause the desync"})
+    @LangKey("config.bpopener.openDelay.name")
+    public static int openDelay = 0;
+
     @Comment("Shows additional info for debug.")
     public static boolean debug = false;
 }
