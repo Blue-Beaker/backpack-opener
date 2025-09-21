@@ -34,6 +34,7 @@ public class BPOHandler {
 
     private static int ticksUntilNextClick = -1;
     private static BackPackClickAction nextClick = null;
+    private static boolean suppressKeyboard = false;
 
     /** Activate the backpack opener */
     @SubscribeEvent
@@ -116,9 +117,11 @@ public class BPOHandler {
         ticksUntilNextClick=BPOpenerConfig.openDelay;
         nextClick=new BackPackClickAction(action,stack);
     }
-    // Process queued click after delay
     @SubscribeEvent
     public static void onTick(TickEvent.ClientTickEvent event){
+        //Clear the suppression of keyboard input on next tick
+        suppressKeyboard=false;
+        // Process queued click after delay
         if(BPOpenerConfig.openDelay<=0) return;
         if(ticksUntilNextClick==0 && nextClick!=null){
             if(mc.player.getHeldItemMainhand().isItemEqual(nextClick.stack))
@@ -129,8 +132,16 @@ public class BPOHandler {
         }
     }
 
+    // Suppress keyboard input to prevent the backpack GUI from being closed before opening
+    @SubscribeEvent
+    public static void onKey(GuiScreenEvent.KeyboardInputEvent.Pre event){
+        if(suppressKeyboard) event.setCanceled(true);
+    }
+
     private static void doClickAction(OpenAction action, EntityPlayerSP player) {
         activated = true;
+        // Suppress keyboard input to prevent the backpack GUI from being closed before opening
+        suppressKeyboard = true;
         boolean shouldSneak = action.isSneaking();
         previousSneaking = player.movementInput.sneak;
 

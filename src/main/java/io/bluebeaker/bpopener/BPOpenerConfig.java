@@ -17,8 +17,7 @@ public class BPOpenerConfig {
 
     @Config.RangeInt(min = 0,max = 100)
     @Comment({"Adds a delay after swapping and before using the item.",
-        "To prevent the desync problem.",
-        "Do not close the inventory during the delay, it may still cause the desync"})
+        "To prevent the desync problem."})
     @LangKey("config.bpopener.openDelay.name")
     public static int openDelay = 0;
 
